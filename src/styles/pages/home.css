@@ -1,0 +1,150 @@
+#page-home{
+    width: 100vw;
+    height: 100vh;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#page-home .content-wrapper{
+    width: 100%;
+    max-width: 1100px;
+
+    height: 100%;
+    max-height: 680px;
+
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+th{
+    font:bold;
+    font-size: 20px;
+    background-color: rgb(30, 48, 168);
+}
+td{
+    font-size: 15px;
+    background-color: rgb(24, 52, 211);
+}
+th,td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    color: white;
+    width: 200px;
+}
+
+.enter-crud{
+    margin-top: 30px;
+}
+.content-wrapper main p{
+    text-align: center;
+}
+
+
+form.verify-price-form {
+    width: 90%;
+    margin: 64px auto;
+  
+    background: #FFFFFF;
+    border: 1px solid #D3E2E5;
+    border-radius: 20px;
+  
+    padding: 20px 80px;
+  
+  }
+
+  
+  form.verify-price-form fieldset {
+    border: 0;
+    display:flex;
+    flex-direction: row; 
+    justify-content: space-between;
+  }
+  
+  form.verify-price-form fieldset + fieldset {
+    margin-top: 40px;
+  }
+  
+  form.verify-price-form fieldset legend {
+    width: 100%;
+  
+    font-size: 32px;
+    line-height: 34px;
+    color: #5C8599;
+    font-weight: 700;
+  
+    border-bottom: 1px solid #D3E2E5;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+  form.verify-price-form .input-block{
+    color: #5C8599;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  form.verify-price-form .input-block label{
+    text-align: center;
+    }
+      
+  form.verify-price-form .input-block input,
+  .select-plan,
+  form.verify-price-form .input-block textarea {
+    width: 100%;
+    background: #F5F8FA;
+    color: #5C8599;
+    outline: none;
+
+    
+    
+    color: #5C8599;
+  }
+
+  form.verify-price-form .input-block input,form.verify-price-form .input-block textarea
+{   
+    border: 1px solid #D3E2E5;
+    border-radius: 20px;
+  }
+  form.verify-price-form .input-block input,
+  .select-plan{
+    height: 48px;
+    width: 200px;
+    padding: 0 8px;
+    margin-left: 12px;
+    
+  }
+
+
+  
+  .button-wrapper{
+      display: flex;
+      justify-content: center;
+  }
+  form.verify-price-form button.confirm-button {
+    margin-top: 30px;
+    width: 50%;
+    height: 64px;
+    border: 0;
+    cursor: pointer;
+    background-color: rgb(30, 48, 168);
+    border-radius: 20px;
+    color: #FFFFFF;
+    font-weight: 800;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    transition: background-color 0.2s;
+  }
+  
+ 
+  form.verify-price-form button.confirm-button:hover {
+    background: #36CF82;
+  }
+
+  input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
