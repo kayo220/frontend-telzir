@@ -8,7 +8,7 @@ interface DDD {
 }
 
 interface Cover {
-  id: string,
+  id?: string,
   from: string,
   to: string,
   charge: number
@@ -30,13 +30,22 @@ interface Plan {
 function App() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [planName, setPlanName] = useState('');
+  const [planTimeLimit, setPlanTimeLimit] = useState('');
+
+  const [fromTarifa, setFromTarifa] = useState('');
+  const [toTarifa, setToTarifa] = useState('');
+  const [cost, setCost] = useState('');
+  const [ddd, setDDD] = useState('');
+
   const [duration, setDuration] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
   const [selectedName, setSelectedName] = useState('');
 
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [ddds, setDdds] = useState<DDD[]>([]);
 
-  const [plan, setPlan] = useState('');
+
 
   const [cover, setCover] = useState<Cover[]>([]);
 
@@ -56,11 +65,16 @@ function App() {
       setSelectedName(response.data[0].name)
 
     })
+    api.get('ddd').then(response => {
+
+      setDdds(response.data);
+
+    })
   }, []);
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmitCost(event: FormEvent) {
     event.preventDefault();
-    const response = await api.post('/calculate/charge', {
+    await api.post('/calculate/charge', {
       from: from,
       to: to,
       duration: duration,
@@ -93,7 +107,54 @@ function App() {
     setSelectedName(event.target.selectedOptions[0].label)
   }
 
+  async function handleSubmitTarifa(event: FormEvent) {
+    event.preventDefault();
+    await api.post('/create/price', {
+      from: { code: fromTarifa },
+      to: { code: toTarifa },
+      charge: cost,
+    }).then(response => {
+      response.data.charge = Number(response.data.charge);
+      const covers = [...cover, response.data]
+      setCover(covers);
+    }
+    ).catch(error => {
+      alert(error.response.data.message)
+      return Promise.reject(error)
+    }
+    );
+  }
 
+  async function handleSubmitPlan(event: FormEvent) {
+    event.preventDefault();
+    await api.post('/create/plan', {
+      name: planName,
+      free_time_limit: planTimeLimit
+    }).then(response => {
+      const newPlans = [...plans, response.data]
+      setPlans(newPlans);
+    }
+    ).catch(error => {
+      alert(error.response.data.message)
+      return Promise.reject(error)
+    }
+    );
+  }
+
+  async function handleSubmitDDD(event: FormEvent) {
+    event.preventDefault();
+    await api.post('/create/ddd', {
+      code: ddd,
+    }).then(response => {
+      const newDDDs = [...ddds, response.data]
+      setDdds(newDDDs);
+    }
+    ).catch(error => {
+      alert(error.response.data.message)
+      return Promise.reject(error)
+    }
+    );
+  }
   return (
     <div id="page-home">
       <div className="content-wrapper">
@@ -101,6 +162,7 @@ function App() {
           <h1>Tellzir</h1>
           <p>Fale Mais!</p>
         </main>
+
 
         <div className="prices" style={{ display: price.length > 0 ? 'block' : 'none' }} >
           <table>
@@ -123,11 +185,11 @@ function App() {
                       <td>{row.to}</td>
                       <td>{row.duration}</td>
                       <td>{row.plan}</td>
-                      {row.chargeWithPlan != '-' ?
+                      {row.chargeWithPlan !== '-' ?
                         <td>${Number(row.chargeWithPlan).toFixed(2)}</td> :
                         <td>{row.chargeWithPlan}</td>
                       }
-                      {row.chargeWithoutPlan != '-' ?
+                      {row.chargeWithoutPlan !== '-' ?
                         <td>${Number(row.chargeWithoutPlan).toFixed(2)}</td> :
                         <td>{row.chargeWithoutPlan}</td>
                       }
@@ -141,9 +203,9 @@ function App() {
         <div className="prices" style={{ marginTop: '20px', display: price.length <= 0 ? 'block' : 'none' }} >
           <h1> Insira valores para calcular a estimativa de custo! </h1>
         </div>
-        <form onSubmit={handleSubmit} className="verify-price-form">
+        <form onSubmit={handleSubmitCost} className="verify-price-form">
           <fieldset>
-            <legend>Dados</legend>
+            <legend>Dados para cálculo de custo usando um de nossos planos!</legend>
 
             <div className="input-block">
               <label htmlFor="from">Origem</label>
@@ -179,7 +241,7 @@ function App() {
                 {
                   plans.map(plan => {
                     return (
-                      <option value={plan.id}>{plan.name}</option>
+                      <option key={plan.id} value={plan.id}>{plan.name}</option>
                     );
                   })
                 }
@@ -195,6 +257,54 @@ function App() {
             </button>
           </div>
         </form >
+
+
+        <div className="prices" >
+          <table>
+            <caption>DDDs cadastrados</caption>
+            <thead>
+              <tr>
+                <th>Código</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                ddds.map(row => {
+                  return (
+                    <tr>
+                      <td>{row.code}</td>
+                    </tr>
+                  )
+                })
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <form onSubmit={handleSubmitDDD} className="verify-price-form">
+          <fieldset>
+            <legend>Formulário para inserção de DDD!</legend>
+            <div id="ddd-form">
+              <div className="input-block" >
+                <label htmlFor="from">Código</label>
+                <input required
+                  type="number"
+                  id="ddd"
+                  value={ddd}
+                  onChange={event => setDDD(event.target.value)}
+                />
+              </div>
+            </div>
+          </fieldset>
+          <div className="button-wrapper">
+            <button className="confirm-button" type="submit">
+              Inserir DDD
+            </button>
+          </div>
+        </form >
+
+
+
 
         <div className="prices">
           <table>
@@ -222,6 +332,45 @@ function App() {
           </table>
         </div>
 
+        <form onSubmit={handleSubmitTarifa} className="verify-price-form">
+          <fieldset>
+            <legend>Formulário para inserção de tarifas!</legend>
+
+            <div className="input-block">
+              <label htmlFor="from">Origem</label>
+              <input required
+                id="fromTarifa"
+                value={fromTarifa}
+                onChange={event => setFromTarifa(event.target.value)}
+              />
+            </div>
+
+            <div className="input-block">
+              <label htmlFor="to">Destino</label>
+              <input required
+                id="toTarifa"
+                value={toTarifa}
+                onChange={event => setToTarifa(event.target.value)}
+              />
+            </div>
+            <div className="input-block">
+              <label htmlFor="cost">Custo por minuto (ex. 8.5)</label>
+              <input required
+                id="cost"
+                value={cost}
+                type="number"
+                onChange={event => setCost(event.target.value)}
+              />
+            </div>
+
+          </fieldset>
+          <div className="button-wrapper">
+            <button className="confirm-button" type="submit">
+              Inserir tarifa
+            </button>
+          </div>
+        </form >
+
         <div className="prices" style={{ marginTop: "40px" }}>
           <table>
             <caption>Planos Disponíveis</caption>
@@ -246,7 +395,35 @@ function App() {
           </table>
         </div>
 
-        <a href="" className="enter-crud">Link</a>
+        <form onSubmit={handleSubmitPlan} className="verify-price-form">
+          <fieldset>
+            <legend>Formulário para inserção de planos!</legend>
+
+            <div className="input-block">
+              <label htmlFor="from">Nome do plano</label>
+              <input required
+                id="planName"
+                value={planName}
+                onChange={event => setPlanName(event.target.value)}
+              />
+            </div>
+
+            <div className="input-block">
+              <label htmlFor="planTimeLimit">Tempo de Franquia (minutos)</label>
+              <input required
+                type="number"
+                id="planTimeLimit"
+                value={planTimeLimit}
+                onChange={event => setPlanTimeLimit(event.target.value)}
+              />
+            </div>
+          </fieldset>
+          <div className="button-wrapper">
+            <button className="confirm-button" type="submit">
+              Inserir Plano
+            </button>
+          </div>
+        </form >
       </div >
     </div >
   );
